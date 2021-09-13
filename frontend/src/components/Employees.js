@@ -56,7 +56,7 @@ class Employees extends Component {
 
     handleSubmit = (employee) =>{
         this.toggle();
-        
+
         if(employee.id){
             axios
             .post(`/employee/update/${employee.id}`, employee)
@@ -128,9 +128,9 @@ class Employees extends Component {
                 <h2><b>Manage Employees</b></h2>
                 <hr/>
                 <div className="row">
-                    <div className="col-6">                              */}
+                    <div className="col-8">                          
                         <div className="row">                            
-                            <div className="col-4 col-md-6">
+                            <div className="col- col-md-10">
                                 <input type="text" 
                                     className="form-control" 
                                     name="tag" 
@@ -140,7 +140,7 @@ class Employees extends Component {
                                     onChange={(e) => this.handleSearchChange(e)}
                                     />
                             </div>
-                            <div className="col-6 col-md-2" align="left">
+                            <div className="col- col-md-2" align="left">
                                 <input 
                                     type="submit" 
                                     value='Search'
@@ -150,7 +150,7 @@ class Employees extends Component {
                             </div>  
                         </div>
                     </div>
-                    <div className="col-6">
+                    <div className="col-4">
                         <button type="button" className="btn btn-dark float-right" 
                             onClick={this.createEmployee}><b>Add New Employees</b>
                         </button>
