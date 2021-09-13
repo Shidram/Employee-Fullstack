@@ -33,7 +33,7 @@ class Employees extends Component {
 
         if(isSearchString){
             axios
-            .post(`/employee/search/${searchPattern}/`)
+            .post(`/employee/search/${searchPattern}`)
             .then( (res) => 
                 this.setState({employeesList:res.data.data})
             )
