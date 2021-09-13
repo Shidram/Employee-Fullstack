@@ -1,19 +1,29 @@
-# from backend_django import employee
 from django.shortcuts import render
 from rest_framework.fields import empty
 from employee.serializers import EmployeeSerializer
 from employee.models import EmployeeModel
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 # Create your views here.
 
 class EmployeeAPIView(APIView):
     def get(self,request):
-        employeeObj = EmployeeModel.objects.all()
+        employeeObj = EmployeeModel.objects.all().order_by('firstname')
         employeeSerializeObj = EmployeeSerializer(employeeObj,many=True)
+        
+        tag = request.GET.get('tag',None)
+        if tag is not None:
+            search = "%{}%".format(tag)
+            employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=search)
+            employeeSearchSerializeObj = EmployeeSerializer(employeesSearchObj,many=True)
+            return Response({
+                    'success': status.HTTP_200_OK,
+                    'data': employeeSearchSerializeObj.data
+                })
         return Response({
-                    'success':True,
+                    'success': status.HTTP_200_OK,
                     'data': employeeSerializeObj.data
                 })
 
@@ -22,11 +32,28 @@ class EmployeeAPIView(APIView):
         if serializeObj.is_valid():
             serializeObj.save()
             return Response({
-                    'status': 200,
+                    'status': status.HTTP_201_CREATED,
                     'message': 'Employee Created Successfully.',
                     'data':serializeObj.data,
                 })
         return Response(serializeObj.errors)
+
+class EmployeeSearchAPIView(APIView):
+    def post(self, request, firstname):
+        try:
+            employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(firstname))
+        except:            
+            return Response({
+                'status': status.HTTP_404_NOT_FOUND,
+                'message': 'Failed to Search, Employees Not Found.',
+                'data':'',
+            })        
+        employeeSearchSerializeObj = EmployeeSerializer(employeesSearchObj, many=True)
+
+        return Response({
+                'success': status.HTTP_200_OK,
+                'data': employeeSearchSerializeObj.data
+            })
 
 class EmployeeUpdateAPIView(APIView):
     def post(self, request, pk):
@@ -34,6 +61,7 @@ class EmployeeUpdateAPIView(APIView):
             employeeObj = EmployeeModel.objects.get(pk=pk)
         except:
             return Response({
+                'status': status.HTTP_404_NOT_FOUND,
                 'message': 'Updation Failed, Employee Not Found.',
                 'data':'',
             })
@@ -41,7 +69,7 @@ class EmployeeUpdateAPIView(APIView):
         if serializeObj.is_valid():
             serializeObj.save()
             return Response({
-                    'status': 200,
+                    'status':status.HTTP_200_OK,
                     'message': 'Employee Updated Successfully.',
                     'data':serializeObj.data,
                 })
@@ -53,12 +81,13 @@ class EmployeeDeleteAPIView(APIView):
             employeeObj = EmployeeModel.objects.get(pk=pk)
         except:
             return Response({
+                'status': status.HTTP_404_NOT_FOUND,
                 'message': 'Deletion Failed, Employee Not Found.',
                 'data':'',
             })
         employeeObj.delete()
         return Response({
-                'status': 200,
+                'status': status.HTTP_200_OK,
                 'message': 'Employee Deleted Successfully.',
                 'data':''
             })
