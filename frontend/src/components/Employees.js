@@ -86,7 +86,7 @@ class Employees extends Component {
 
     handleSearch = (searchTerm) => {
             this.refreshList()
-            this.setState({isSearch:false})
+            this.setState({isSearch:false, search:''})
     }
 
     handleDelete = (employee) => {
