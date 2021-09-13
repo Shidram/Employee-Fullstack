@@ -10,6 +10,7 @@ class Employees extends Component {
         this.state = {
              employeesList:[],
              modal: false,
+             search:"",
              activeEmployee:{
                 firstname:"",
                 lastname:"",
@@ -42,7 +43,7 @@ class Employees extends Component {
 
     handleSubmit = (employee) =>{
         this.toggle();
-        console.log(employee);
+        
         if(employee.id){
             axios
             .post(`/employee/update/${employee.id}`, employee)
@@ -61,6 +62,22 @@ class Employees extends Component {
 
     editEmployee = (employee) => {
         this.setState({ activeEmployee: employee, modal: !this.state.modal })
+    }
+
+    handleSearchChange(e){        
+        this.setState({
+            search:e.target.value
+        })
+    }
+
+    handleSearch = (searchTerm) => {
+        axios
+        .post(`/employee/search/${searchTerm}`)
+        .then((res) =>
+            console.log(res.data.data)
+            // (res) => this.setState({employeesList:res.data.data})
+        )
+        .catch((err) => console.log(err))
     }
 
     handleDelete = (employee) => {
@@ -103,25 +120,37 @@ class Employees extends Component {
                 <hr/>
                 <div className="row">
                     <div className="col-6">
-                        <form action="" method="post" autocomplete="off">                             
+                        <form action="" method="post" autoComplete="off">                             
                             <div className="row">                            
                                 <div className="col-4 col-md-6">
-                                    <input type="text" className="form-control" name="tag" id="tag"  placeholder="Search like fieldname: partial_or_full_text (example search -> firstname: abc)"/> 
-                                
+                                    <input type="text" 
+                                        className="form-control" 
+                                        name="tag" 
+                                        id="tag"  
+                                        placeholder="Search like fieldname: partial_or_full_text (example search -> firstname: abc)"
+                                        value={this.state.search}
+                                        onChange={(e) => this.handleSearchChange(e)}
+                                        /> 
+                                    {/* <i className="search icon"></i> */}
                                 </div>
                                 <div className="col-6 col-md-2" align="left">
-                                    <input type="submit" value="Search" className="form-control btn btn-primary " name=""/> 
+                                    <input 
+                                        type="submit" 
+                                        value='Search'
+                                        className="form-control btn btn-primary " 
+                                        onClick={()=>this.handleSearch(this.state.search)}
+                                        /> 
                                 </div>  
                             </div>
                         </form> 
                     </div>
-                </div>
-                <hr/>
-                <div className="row float-right">
-                        <button type="button" className="btn btn-dark" 
+                    <div className="col-6">
+                        <button type="button" className="btn btn-dark float-right" 
                             onClick={this.createEmployee}><b>Add New Employees</b>
                         </button>
+                    </div>
                 </div>
+                <hr/>
                 <div className="row">
                     <div className="col-12">
                         <table id="example" className="table table-striped table-bordered">
