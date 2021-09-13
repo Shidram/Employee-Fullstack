@@ -18,6 +18,8 @@ npm install react-datepicker --save
 
 In the project directory, you can run:
 
+### Before starting frontend server make sure backend server is running
+
 ### `npm start`
 
 Runs the app in the development mode.\
