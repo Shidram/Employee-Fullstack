@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from rest_framework.fields import empty
 from employee.serializers import EmployeeSerializer
 from employee.models import EmployeeModel
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 # Create your views here.
 
@@ -39,9 +39,17 @@ class EmployeeAPIView(APIView):
         return Response(serializeObj.errors)
 
 class EmployeeSearchAPIView(APIView):
-    def post(self, request, firstname):
+    def post(self, request, searchField):
         try:
-            employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(firstname))
+            if searchField is not None:
+                modelFields = [f.name for f in EmployeeModel._meta.get_fields()]
+
+                searchParam = list(x.strip() for x in searchField.split(':'))
+                if searchParam[0] in modelFields and len(searchParam)>1:
+                    lookups= Q(**{"%s__icontains" % searchParam[0]:str(searchParam[1])})
+                    employeesSearchObj = EmployeeModel.objects.filter(lookups)
+                else:
+                    employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(searchField))
         except:            
             return Response({
                 'status': status.HTTP_404_NOT_FOUND,
