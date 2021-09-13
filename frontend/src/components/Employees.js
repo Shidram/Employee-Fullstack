@@ -11,6 +11,7 @@ class Employees extends Component {
              employeesList:[],
              modal: false,
              search:"",
+             isSearch:false,
              activeEmployee:{
                 firstname:"",
                 lastname:"",
@@ -27,14 +28,26 @@ class Employees extends Component {
     }
 
     refreshList = () =>{
-        axios
-        .get('/employee/')
-        .then(
-            (res) => 
-            // console.log(res.data.data)
-            this.setState({employeesList:res.data.data})
-        )
-        .catch((err) => console.log(err))
+        const isSearchString = this.state.isSearch
+        const searchPattern = this.state.search
+
+        if(isSearchString){
+            axios
+            .post(`/employee/search/${searchPattern}/`)
+            .then( (res) => 
+                this.setState({employeesList:res.data.data})
+            )
+            .catch((err) => console.log(err));
+
+        } else {
+            axios
+            .get('/employee/')
+            .then(
+                (res) => 
+                this.setState({employeesList:res.data.data})
+            )
+            .catch((err) => console.log(err))
+        }
     }
 
     toggle = () => {
@@ -66,18 +79,14 @@ class Employees extends Component {
 
     handleSearchChange(e){        
         this.setState({
-            search:e.target.value
+            search:e.target.value,
+            isSearch:true
         })
     }
 
     handleSearch = (searchTerm) => {
-        axios
-        .post(`/employee/search/${searchTerm}`)
-        .then((res) =>
-            console.log(res.data.data)
-            // (res) => this.setState({employeesList:res.data.data})
-        )
-        .catch((err) => console.log(err))
+            this.refreshList()
+            this.setState({isSearch:false})
     }
 
     handleDelete = (employee) => {
@@ -119,30 +128,27 @@ class Employees extends Component {
                 <h2><b>Manage Employees</b></h2>
                 <hr/>
                 <div className="row">
-                    <div className="col-6">
-                        <form action="" method="post" autoComplete="off">                             
-                            <div className="row">                            
-                                <div className="col-4 col-md-6">
-                                    <input type="text" 
-                                        className="form-control" 
-                                        name="tag" 
-                                        id="tag"  
-                                        placeholder="Search like fieldname: partial_or_full_text (example search -> firstname: abc)"
-                                        value={this.state.search}
-                                        onChange={(e) => this.handleSearchChange(e)}
-                                        /> 
-                                    {/* <i className="search icon"></i> */}
-                                </div>
-                                <div className="col-6 col-md-2" align="left">
-                                    <input 
-                                        type="submit" 
-                                        value='Search'
-                                        className="form-control btn btn-primary " 
-                                        onClick={()=>this.handleSearch(this.state.search)}
-                                        /> 
-                                </div>  
+                    <div className="col-6">                              */}
+                        <div className="row">                            
+                            <div className="col-4 col-md-6">
+                                <input type="text" 
+                                    className="form-control" 
+                                    name="tag" 
+                                    id="tag"  
+                                    placeholder="Search like fieldname: partial_or_full_text (example search -> firstname: abc)"
+                                    value={this.state.search}
+                                    onChange={(e) => this.handleSearchChange(e)}
+                                    />
                             </div>
-                        </form> 
+                            <div className="col-6 col-md-2" align="left">
+                                <input 
+                                    type="submit" 
+                                    value='Search'
+                                    className="form-control btn btn-primary " 
+                                    onClick={()=>this.handleSearch()}
+                                    /> 
+                            </div>  
+                        </div>
                     </div>
                     <div className="col-6">
                         <button type="button" className="btn btn-dark float-right" 
