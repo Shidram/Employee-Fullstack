@@ -49,7 +49,9 @@ class EmployeeSearchAPIView(APIView):
                     lookups= Q(**{"%s__icontains" % searchParam[0]:str(searchParam[1])})
                     employeesSearchObj = EmployeeModel.objects.filter(lookups)
                 else:
-                    employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(searchField))
+                    employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(searchField))            
+            else:
+                employeesSearchObj = EmployeeModel.objects.filter(firstname__icontains=str(searchField))
         except:            
             return Response({
                 'status': status.HTTP_404_NOT_FOUND,
